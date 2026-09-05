@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mock WhatsApp Web Pro (V2 Sandbox)</title>
+  <style>
+    :root {
+      --wa-header-bg: #eae6df;
+      --wa-green: #00a884;
+      --wa-chat-bg: #efeae2;
+      --border-color: #e9edef;
+      --text-dark: #111b21;
+      --text-gray: #667781;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #d1d7db;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: var(--text-dark);
+      position: relative;
+    }
+    
+    .window {
+      width: 950px;
+      height: 600px;
+      background-color: #ffffff;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+      border-radius: 3px;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    /* Left sidebar */
+    .sidebar {
+      width: 350px;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidebar-header {
+      background-color: #f0f2f5;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .sidebar-title {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .group-info {
+      background-color: #ffffff;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .group-info h3 {
+      margin: 0 0 4px 0;
+      font-size: 15px;
+    }
+    
+    .group-info p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-gray);
+    }
+    
+    /* Scrollable contact list (Sidebar) */
+    .group {
+      flex: 1;
+      overflow-y: auto;
+      background-color: #ffffff;
+      max-height: 400px;
+    }
+    
+    .member {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f2f5;
+      transition: background-color 0.15s ease;
+    }
+    
+    .member:hover {
+      background-color: #f5f6f6;
+    }
+    
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #e2e8f0;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #718096;
+      font-size: 14px;
+    }
+    
+    .member-details {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    
+    .name {
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--text-dark);
+    }
+    
+    .number {
+      font-size: 12px;
+      color: var(--text-gray);
+      margin-top: 2px;
+    }
+
+    .badge-admin {
+      background-color: #d9fdd3;
+      color: #128c7e;
+      font-size: 9px;
+      font-weight: bold;
+      padding: 2px 4px;
+      border-radius: 4px;
+      align-self: flex-start;
+      margin-top: 2px;
+    }
+    
+    .view-all-row {
+      padding: 16px;
+      text-align: center;
+      background-color: #fff;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .view-all-link {
+      color: var(--wa-green);
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .view-all-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Right panel instructions */
+    .chat-panel {
+      flex: 1;
+      background-color: var(--wa-chat-bg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    
+    .instructions-card {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border-top: 4px solid var(--wa-green);
+    }
+    
+    .instructions-card h2 {
+      margin-top: 0;
+      color: var(--wa-green);
+      font-size: 18px;
+    }
+    
+    .instructions-card ol {
+      padding-left: 20px;
+      margin-bottom: 0;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .instructions-card li {
+      margin-bottom: 8px;
+    }
+
+    .badge-dev {
+      background-color: #eae6df;
+      color: var(--text-gray);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* Modal dialog (role="dialog") simulation */
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.85);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      width: 450px;
+      height: 500px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 11px 34px 0 rgba(0,0,0,.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-header {
+      background-color: #f0f2f5;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--text-dark);
+    }
+
+    .modal-close-btn {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--text-gray);
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .modal-search-container {
+      padding: 10px 16px;
+      background-color: #fff;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-search-input {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      font-size: 13px;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    /* Scrollable list inside modal dialog */
+    .modal-scroll-list {
+      flex: 1;
+      overflow-y: scroll;
+      height: 380px;
+      background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="window">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title">Group Members Drawer</span>
+        <span class="badge-dev">V2 SANDBOX</span>
+      </div>
+
+      <div class="group-info">
+        <h3>WhatsApp Web Dev Group</h3>
+        <p>50 Participants</p>
+      </div>
+
+      <!-- Scrollable Container (Sidebar Drawer contains only first 10) -->
+      <div class="group">
+        <!-- Contact 1 -->
+        <div class="member">
+          <div class="avatar">A</div>
+          <div class="member-details">
+            <span class="name">Amit Sharma</span>
+            <span class="number">+919999999999</span>
+            <span class="badge-admin">Admin</span>
+          </div>
+        </div>
+
+        <!-- Contact 2 -->
+        <div class="member">
+          <div class="avatar">R</div>
+          <div class="member-details">
+            <span class="name">Rahul Verma</span>
+            <span class="number">+918888888888</span>
+            <span class="badge-admin">Admin</span>
+          </div>
+        </div>
+
+        <!-- Contact 3 -->
+        <div class="member">
+          <div class="avatar">P</div>
+          <div class="member-details">
+            <span class="name">Priya Patel</span>
+            <span class="number">+917777777777</span>
+            <span class="badge-admin">Admin</span>
+          </div>
+        </div>
+
+        <!-- Contact 4 -->
+        <div class="member">
+          <div class="avatar">S</div>
+          <div class="member-details">
+            <span class="name">Siddharth Sen</span>
+            <span class="number">+911111111111</span>
+          </div>
+        </div>
+
+        <!-- Contact 5 -->
+        <div class="member">
+          <div class="avatar">N</div>
+          <div class="member-details">
+            <span class="name">Neha Gupta</span>
+            <span class="number">+912222222222</span>
+          </div>
+        </div>
+
+        <!-- Contact 6 -->
+        <div class="member">
+          <div class="avatar">V</div>
+          <div class="member-details">
+            <span class="name">Vikram Singh</span>
+            <span class="number">+913333333333</span>
+          </div>
+        </div>
+
+        <!-- Contact 7 -->
+        <div class="member">
+          <div class="avatar">K</div>
+          <div class="member-details">
+            <span class="name">Karan Johar</span>
+            <span class="number">+914444444444</span>
+          </div>
+        </div>
+
+        <!-- Contact 8 -->
+        <div class="member">
+          <div class="avatar">D</div>
+          <div class="member-details">
+            <span class="name">Deepika Padukone</span>
+            <span class="number">+915555555555</span>
+          </div>
+        </div>
+
+        <!-- Contact 9 -->
+        <div class="member">
+          <div class="avatar">R</div>
+          <div class="member-details">
+            <span class="name">Ranveer Singh</span>
+            <span class="number">+916666666666</span>
+          </div>
+        </div>
+
+        <!-- Contact 10 -->
+        <div class="member">
+          <div class="avatar">A</div>
+          <div class="member-details">
+            <span class="name">Alia Bhatt</span>
+            <span class="number">+919876543210</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- View all link mimicking WhatsApp Web -->
+      <div class="view-all-row">
+        <a class="view-all-link" id="view-all-trigger">View all (40 more)</a>
+      </div>
+    </div>
+    
+    <div class="chat-panel">
+      <div class="instructions-card">
+        <h2>V2 Sandbox Test Instructions</h2>
+        <ol>
+          <li>Open Google Chrome, navigate to <code>chrome://extensions</code>, and click **Reload** on the extension to load V2 changes.</li>
+          <li>Click the green link in the sidebar drawer: <strong>"View all (40 more)"</strong>. This displays the active modal dialog container in the center.</li>
+          <li>Click the pinned extension icon to open the popup. Note the updated layout:
+            <ul>
+              <li>Scroll Speed configuration</li>
+              <li>Group Name metadata detection</li>
+              <li>Real-time Progress indicators</li>
+              <li>Scraped List preview and quick search box</li>
+            </ul>
+          </li>
+          <li>Click <strong>Start</strong> in the popup.</li>
+          <li>Watch the extension target the modal dialog scroll-list directly, scroll down, trigger mock virtual renders, and extract all 50 contacts while filtering duplicate rows!</li>
+        </ol>
+      </div>
+
+      <div style="text-align: center; color: var(--text-gray); font-size: 13px;">
+        WA Contact Exporter Sandboxed Environment • Pro Version V2
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Modal Dialog simulating Search Members popup -->
+  <div class="modal-overlay" id="members-modal-wrapper">
+    <div class="modal-content" role="dialog" data-testid="members-modal">
+      <div class="modal-header">
+        <span class="modal-title">Search members</span>
+        <button class="modal-close-btn" id="modal-close-trigger">&times;</button>
+      </div>
+      <div class="modal-search-container">
+        <input type="text" class="modal-search-input" placeholder="Search contacts" data-testid="search-input">
+      </div>
+      
+      <!-- Scrollable List inside Modal (contains all 50 items with duplicates) -->
+      <div class="modal-scroll-list">
+        <!-- Rows will be populated dynamically by JavaScript to allow virtualized simulation -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mock database of 50 contacts with duplicates
+    const mockContacts = [
+      { name: "Amit Sharma", phone: "+919999999999", admin: true },
+      { name: "Rahul Verma", phone: "+918888888888", admin: true },
+      { name: "Priya Patel", phone: "+917777777777", admin: true },
+      { name: "Amit Sharma (Duplicate)", phone: "+919999999999" },
+      { name: "Siddharth Sen", phone: "+911111111111" },
+      { name: "Neha Gupta", phone: "+912222222222" },
+      { name: "Vikram Singh", phone: "+913333333333" },
+      { name: "Rahul Verma (Duplicate)", phone: "+918888888888" },
+      { name: "Karan Johar", phone: "+914444444444" },
+      { name: "Deepika Padukone", phone: "+915555555555" },
+      { name: "Ranveer Singh", phone: "+916666666666" },
+      { name: "Alia Bhatt", phone: "+919876543210" },
+      { name: "Ranbir Kapoor", phone: "+918765432109" },
+      { name: "Alia Bhatt Dup", phone: "+919876543210" },
+      { name: "Katrina Kaif", phone: "+917654321098" },
+      { name: "Vicky Kaushal", phone: "+916543210987" },
+      { name: "Salman Khan", phone: "+915432109876" },
+      { name: "Aamir Khan", phone: "+914321098765" },
+      { name: "Shah Rukh Khan", phone: "+913210987654" },
+      { name: "Anushka Sharma", phone: "+912109876543" },
+      { name: "Vicky Kaushal Dup", phone: "+916543210987" },
+      { name: "Virat Kohli", phone: "+919911991199" },
+      { name: "MS Dhoni", phone: "+917711771177" },
+      { name: "Rohit Sharma", phone: "+914545454545" },
+      { name: "KL Rahul", phone: "+913344556677" },
+      { name: "Hardik Pandya", phone: "+918899889988" },
+      { name: "Jasprit Bumrah", phone: "+916677889900" },
+      { name: "Rishabh Pant", phone: "+911212121212" },
+      { name: "MS Dhoni Dup", phone: "+917711771177" },
+      { name: "Ravindra Jadeja", phone: "+918888888899" },
+      { name: "Shikhar Dhawan", phone: "+917777777788" },
+      { name: "Bhuvneshwar Kumar", phone: "+916666666677" },
+      { name: "Shreyas Iyer", phone: "+915555555566" },
+      { name: "Ishan Kishan", phone: "+914444444455" },
+      { name: "Yuzvendra Chahal", phone: "+913333333344" },
+      { name: "Kuldeep Yadav", phone: "+912222222233" },
+      { name: "Mohammed Shami", phone: "+911111111122" },
+      { name: "Mohammed Siraj", phone: "+910000000011" },
+      { name: "Hardik Pandya Dup", phone: "+918899889988" },
+      { name: "Axar Patel", phone: "+919988776655" },
+      { name: "Suryakumar Yadav", phone: "+918877665544" },
+      { name: "Sanju Samson", phone: "+917766554433" },
+      { name: "Arshdeep Singh", phone: "+916655443322" },
+      { name: "Ravi Bishnoi", phone: "+915544332211" },
+      { name: "Yashasvi Jaiswal", phone: "+914433221100" },
+      { name: "Rinku Singh", phone: "+913322110099" },
+      { name: "Arshdeep Singh Dup", phone: "+916655443322" },
+      { name: "Jitesh Sharma", phone: "+912211009988" },
+      { name: "Tilak Varma", phone: "+911100998877" },
+      { name: "Washington Sundar", phone: "+910099887766" }
+    ];
+
+    const modalWrapper = document.getElementById("members-modal-wrapper");
+    const viewAllBtn = document.getElementById("view-all-trigger");
+    const closeBtn = document.getElementById("modal-close-trigger");
+    const modalList = document.querySelector(".modal-scroll-list");
+
+    // Toggle Modal dialog
+    viewAllBtn.onclick = () => {
+      // Build dynamic list cells in modal list
+      modalList.innerHTML = "";
+      mockContacts.forEach(c => {
+        const item = document.createElement("div");
+        item.className = "member";
+        
+        const avatar = document.createElement("div");
+        avatar.className = "avatar";
+        avatar.textContent = c.name.charAt(0);
+        
+        const details = document.createElement("div");
+        details.className = "member-details";
+        
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "name";
+        // Simulate nicknames with ~ starting character for some rows
+        nameSpan.textContent = c.admin ? c.name : `~ ${c.name}`;
+        
+        const phoneSpan = document.createElement("span");
+        phoneSpan.className = "number";
+        phoneSpan.textContent = c.phone;
+        
+        details.appendChild(nameSpan);
+        details.appendChild(phoneSpan);
+        
+        if (c.admin) {
+          const adminTag = document.createElement("span");
+          adminTag.className = "badge-admin";
+          adminTag.textContent = "Group admin";
+          details.appendChild(adminTag);
+        }
+        
+        item.appendChild(avatar);
+        item.appendChild(details);
+        modalList.appendChild(item);
+      });
+
+      modalWrapper.style.display = "flex";
+    };
+
+    closeBtn.onclick = () => {
+      modalWrapper.style.display = "none";
+    };
+  </script>
+
+</body>
+</html>

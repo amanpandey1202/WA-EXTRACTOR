@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>WA Exporter V3 Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Paywall Screen (Shown when unpaid) -->
+        <div id="paywall-panel" class="paywall-card">
+            <h2>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle;">
+                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                </svg>
+                Unlock Exporter Pro
+            </h2>
+            <div class="paywall-features">
+                <div class="feature-item">✓ Extract all 800+ group members</div>
+                <div class="feature-item">✓ Scroll-Nudge & Loading Spinner detection</div>
+                <div class="feature-item">✓ Parse Country Codes & Admin indicators</div>
+                <div class="feature-item">✓ Export clean Excel CSV / JSON</div>
+            </div>
+            
+            <div class="price-tag">Price: ₹500 (Flat One-Time)</div>
+            
+            <button id="btn-buy-license" class="primary buy-btn">Buy License Key (Razorpay)</button>
+            
+            <div class="license-entry-row">
+                <input type="text" id="license-key-input" class="search-box license-input" placeholder="Paste Payment ID (pay_...) or License Key...">
+                <button id="btn-activate-license" class="primary activate-btn">Activate</button>
+            </div>
+            <div id="paywall-status" class="status-msg error" style="display: none;">Invalid license key. Please check and try again.</div>
+            <div class="paywall-footer">Need help? Contact <a href="mailto:amanpandey8162@gmail.com" style="color: var(--primary-color);">amanpandey8162@gmail.com</a> or visit <a href="https://amanpandey1202.vercel.app/" target="_blank" style="color: var(--primary-color);">amanpandey1202.vercel.app</a></div>
+        </div>
+
+        <!-- Main Dashboard Panel -->
+        <div id="dashboard-panel">
+            <h2>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle;">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.727-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.858-4.42 9.86-9.86.002-2.63-1.023-5.102-2.884-6.964a9.782 9.782 0 00-6.967-2.889c-5.442 0-9.866 4.422-9.869 9.866-.001 1.767.461 3.493 1.34 5.018l-.98 3.58 3.675-.964zm10.742-7.25c-.29-.145-1.716-.848-1.98-.943-.263-.096-.455-.145-.646.145-.19.29-.738.943-.905 1.134-.167.19-.335.213-.625.068-1.396-.698-2.31-1.226-3.23-2.806-.24-.413.24-.383.687-1.278.075-.15.038-.282-.019-.397-.057-.115-.455-1.106-.624-1.512-.165-.397-.333-.343-.455-.349-.12-.006-.254-.007-.39-.007s-.356.05-.542.254c-.187.203-.712.696-.712 1.697 0 1.002.729 1.97 1.01 2.348.283.379 1.433 2.19 3.473 3.068.485.208.863.333 1.157.426.488.156.93.134 1.28.082.39-.058 1.21-.495 1.38-.973.17-.478.17-.887.12-.973-.05-.087-.184-.135-.474-.28z"/>
+                </svg>
+                WA Contact Exporter
+                <span id="main-pro-badge" class="pro-badge" style="display: none;">PRO</span>
+            </h2>
+
+            <!-- Freemium Status Banner -->
+            <div id="freemium-banner" class="meta-panel" style="background: rgba(234, 179, 8, 0.12); border: 1px solid rgba(234, 179, 8, 0.3); margin-top: 6px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div>
+                        <span id="txt-plan-badge" class="pro-badge" style="background: #eab308; color: #000;">FREE PLAN (50 Limit)</span>
+                        <div id="txt-plan-subtitle" class="meta-subtitle" style="margin-top: 3px; font-size: 11px;">Extract up to 50 contacts for free.</div>
+                    </div>
+                    <button id="btn-show-paywall" class="primary" style="padding: 4px 10px; font-size: 11px; width: auto;">Upgrade Pro</button>
+                </div>
+            </div>
+
+            <!-- Active Group Metadata Panel -->
+            <div class="meta-panel" id="meta-container" style="display: none; margin-top: 8px;">
+                <div class="meta-title" id="meta-group-name">Group Name</div>
+                <div class="meta-subtitle" id="meta-count-status">Target: Calculating...</div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-wrapper" id="progress-container" style="display: none; margin-top: 8px;">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progress-fill" style="width: 0%;"></div>
+                </div>
+                <span class="progress-text" id="progress-percent">0%</span>
+            </div>
+
+            <div class="stats-card" style="margin-top: 8px;">
+                <div class="stat-row">
+                    <span class="stat-label">Total Scraped:</span>
+                    <span class="stat-value" id="stat-total">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Unique Contacts:</span>
+                    <span class="stat-value" id="stat-unique" style="color: var(--primary-color);">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Duplicates Skipped:</span>
+                    <span class="stat-value" id="stat-duplicates" style="color: var(--danger-color);">0</span>
+                </div>
+            </div>
+
+            <!-- Settings Selector -->
+            <div class="settings-row" style="margin-top: 8px;">
+                <label for="speed-select" class="settings-label">Scroll Speed:</label>
+                <select id="speed-select" class="settings-dropdown">
+                    <option value="1000">Fast (1.0s)</option>
+                    <option value="1500" selected>Normal (1.5s)</option>
+                    <option value="2500">Slow (2.5s)</option>
+                    <option value="4000">Extra Safe (4.0s)</option>
+                </select>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="controls-row" style="margin-top: 8px;">
+                <button id="start" class="primary">Start</button>
+                <button id="stop" class="danger" disabled>Stop</button>
+            </div>
+
+            <div class="status-bar" id="status-container" style="margin-top: 8px;">
+                <span>Status: <strong id="status-text">Idle</strong></span>
+                <span class="status-dot"></span>
+            </div>
+
+            <!-- Search & Preview Section -->
+            <div class="preview-section" id="preview-container" style="display: none; margin-top: 8px;">
+                <input type="text" id="search-input" class="search-box" placeholder="Search extracted contacts...">
+                <div class="preview-header">Extracted Contacts Preview:</div>
+                <div class="preview-list" id="preview-list"></div>
+            </div>
+
+            <div class="footer-actions" style="margin-top: 8px;">
+                <div class="export-row">
+                    <button id="export-csv" class="secondary" disabled>Export CSV</button>
+                    <button id="export-json" class="secondary" disabled>Export JSON</button>
+                </div>
+                <button id="clear-data" class="secondary" style="border: 1px dashed var(--danger-color); color: var(--danger-color); background: transparent;">Clear Extracted Data</button>
+                <div class="license-info-row">
+                    <span id="txt-license-key-info">License: Active</span>
+                    <a id="btn-deactivate-license" class="deactivate-link">Log out</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "WA Contact Exporter Pro",
+  "version": "1.2.0",
+  "author": "Aman Pandey (amanpandey8162@gmail.com)",
+  "description": "Export user-authorized contact data from WhatsApp Web with licensing security.",
+  "permissions": [
+    "storage",
+    "downloads"
+  ],
+  "host_permissions": [
+    "https://web.whatsapp.com/*",
+    "https://rzp.io/*",
+    "https://*.razorpay.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://web.whatsapp.com/*",
+        "https://rzp.io/*",
+        "https://*.razorpay.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
